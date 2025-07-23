@@ -1,0 +1,32 @@
+name: Build & Push Dify Worker
+ 
+on:
+  push:
+    paths:
+      - 'workers/**'
+    branches: [ main ]
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+ 
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+ 
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+ 
+      - name: Build & Push Worker
+        uses: docker/build-push-action@v4
+        with:
+          context: ./workers/dify
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/dify-worker:latest
